@@ -6,9 +6,13 @@ from .models import Game, Review
 # Create your views here.
 
 
-def games_list(request):
-    games = serializers.serialize('json', Game.objects.all())
-    return render(request)
+def game_list(request):
+    if request.method == 'GET':
+        games = serializers.serialize('json', Game.objects.all())
+        games_data = [{'name': game.name, 'description': game.description} for game in games]
+        return JsonResponse({'games': games_data}, status=200)
+    return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
 
 
 def games_detail(request, title):
