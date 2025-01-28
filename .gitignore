@@ -1,0 +1,9 @@
+.venv
+db.sqlite3
+.mypy_cache
+node_modules/
+.pytest_cache/
+__pycache__/
+cache/
+media/
+.env
