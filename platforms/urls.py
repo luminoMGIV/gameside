@@ -6,5 +6,5 @@ app_name = 'plaforms'
 
 urlpatterns = [
     path('', views.platform_list, name='platform-list'),
-    path('<str:name>/', views.platform_detail, name='platform-detail'),
+    path('<str:slug>/', views.platform_detail, name='platform-detail'),
 ]

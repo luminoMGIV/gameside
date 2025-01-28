@@ -1,15 +1,18 @@
-from django.core import serializers
-from django.http import JsonResponse
+from shared.decorators import method_check
 
 from .models import Platform
+from .serializers import PlatformSerializer
 
 # Create your views here.
 
 
+@method_check('GET')
 def platform_list(request):
-    platforms = serializers.serialize('json', Platform.objects.all())
-    return JsonResponse(platforms, safe=False)
+    data = PlatformSerializer(Platform.objects.all())
+    return data.json_response()
 
 
-def platform_detail(request):
-    pass
+@method_check('GET')
+def platform_detail(request, slug):
+    data = PlatformSerializer(Platform.objects.get(slug=slug))
+    return data.json_response()
