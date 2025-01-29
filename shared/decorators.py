@@ -1,4 +1,4 @@
-from django.http import HttpResponseNotAllowed
+from django.http import JsonResponse
 
 
 def method_check(method):
@@ -6,12 +6,8 @@ def method_check(method):
         def wrapper(*args, **kwargs):
             if args[0].method == method:
                 return func(*args, **kwargs)
-            return HttpResponseNotAllowed('GET')
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
 
         return wrapper
 
     return inner_func
-
-
-# def auth_check(func):
-#     def wrapper(*args, **kwargs):

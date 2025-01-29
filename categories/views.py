@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from shared.decorators import method_check
 
 from .models import Category
@@ -14,5 +15,8 @@ def category_list(request):
 
 @method_check('GET')
 def category_detail(request, slug):
-    data = CategorySerializer(Category.objects.get(slug=slug))
-    return data.json_response()
+    try:
+        data = CategorySerializer(Category.objects.get(slug=slug))
+        return data.json_response()
+    except Category.DoesNotExist:
+        JsonResponse({'error': 'Category not found'}, status=404)

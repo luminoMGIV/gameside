@@ -1,5 +1,3 @@
-# from categories.serializers import CategorySerializer
-# from platforms.serializers import PlatformSerializer
 # from users.serializers import UserSerializer
 from shared.serializers import BaseSerializer
 
@@ -33,9 +31,8 @@ class ReviewSerializer(BaseSerializer):
             'id': instance.pk,
             'rating': instance.rating,
             'comment': instance.comment,
-            'game': GameSerializer(instance.game),
+            # 'game': GameSerializer(instance.game),
             # 'user': UserSerializer(instance.user),
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
-            'released_at': instance.released_at,
         }
