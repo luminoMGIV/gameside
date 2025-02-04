@@ -9,7 +9,6 @@ class CategorySerializer(BaseSerializer):
         return {
             'id': instance.pk,
             'name': instance.name,
-            'id': instance.pk,
             'slug': instance.slug,
             'description': instance.description,
             'color': instance.color,

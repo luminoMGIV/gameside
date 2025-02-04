@@ -13,14 +13,14 @@ from .serializers import GameSerializer, ReviewSerializer
 
 @method_check(method='GET')
 def game_list(request):
-    data = GameSerializer(Game.objects.all())
+    data = GameSerializer(Game.objects.all(), request=request)
     return data.json_response()
 
 
 @method_check(method='GET')
 def games_detail(request, slug):
     try:
-        data = GameSerializer(Game.objects.get(slug=slug))
+        data = GameSerializer(Game.objects.get(slug=slug), request=request)
         return data.json_response()
     except Game.DoesNotExist:
         return JsonResponse({'error': 'Game not found'}, status=404)
