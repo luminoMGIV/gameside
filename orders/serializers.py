@@ -1,6 +1,7 @@
+from games.serializers import GameSerializer
 from shared.serializers import BaseSerializer
+from users.serializers import UserSerializer
 
-# from users.serializers import UserSerializer
 from .models import Order
 
 
@@ -13,8 +14,8 @@ class OrderSerializer(BaseSerializer):
             'id': instance.pk,
             'status': instance.get_status_display(),
             'key': instance.key if instance.status == Order.Status.PAID else None,
-            # 'user': UserSerializer(instance.user),
-            # 'games': GameSerializer(instance.games),
+            'user': BaseSerializer.to_json(UserSerializer(instance.user)),
+            'games': BaseSerializer.to_json(GameSerializer(instance.games)),
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
         }

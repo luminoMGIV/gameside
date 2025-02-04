@@ -30,9 +30,6 @@ class Game(models.Model):
         return self.title
 
 
-0
-
-
 class Review(models.Model):
     comment = models.TextField()
     rating = models.PositiveSmallIntegerField(

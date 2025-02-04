@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from shared.decorators import method_check
 
 from .models import Platform
@@ -14,5 +15,8 @@ def platform_list(request):
 
 @method_check('GET')
 def platform_detail(request, slug):
-    data = PlatformSerializer(Platform.objects.get(slug=slug))
-    return data.json_response()
+    try:
+        data = PlatformSerializer(Platform.objects.get(slug=slug))
+        return data.json_response()
+    except Platform.DoesNotExist:
+        return JsonResponse({'error': 'Platform not found'}, status=404)

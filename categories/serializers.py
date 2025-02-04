@@ -7,6 +7,7 @@ class CategorySerializer(BaseSerializer):
 
     def serialize_instance(self, instance) -> dict:
         return {
+            'id': instance.pk,
             'name': instance.name,
             'id': instance.pk,
             'slug': instance.slug,
