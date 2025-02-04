@@ -4,8 +4,6 @@ from shared.decorators import method_check
 from .models import Platform
 from .serializers import PlatformSerializer
 
-# Create your views here.
-
 
 @method_check('GET')
 def platform_list(request):

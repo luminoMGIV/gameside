@@ -4,8 +4,6 @@ from shared.decorators import method_check
 from .models import Category
 from .serializers import CategorySerializer
 
-# Create your views here.
-
 
 @method_check('GET')
 def category_list(request):

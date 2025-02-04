@@ -3,8 +3,6 @@ from shared.decorators import method_check
 from .models import Order
 from .serializers import OrderSerializer
 
-# Create your views here.
-
 
 @method_check('POST')
 def add_order(request):
