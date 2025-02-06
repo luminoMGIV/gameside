@@ -1,7 +1,7 @@
-import re
 import json
-from django.http import JsonResponse
+import re
 
+from django.http import JsonResponse
 from users.models import Token
 
 
@@ -28,10 +28,11 @@ def user_check(func):
                 return func(user=user, *args, **kwargs)
             except Token.DoesNotExist:
                 return JsonResponse({'error': 'Unregistered authentication token'}, status=401)
-            
+
         return JsonResponse({'error': 'Invalid authentication token'}, status=400)
 
     return wrapper
+
 
 def json_check(func):
     def wrapper(*args, **kwargs):
@@ -40,5 +41,5 @@ def json_check(func):
             return func(json_data=json_data, *args, **kwargs)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON body'}, status=400)
-    
+
     return wrapper
