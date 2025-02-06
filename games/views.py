@@ -4,7 +4,7 @@ import re
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from shared.decorators import method_check
+from shared.decorators import method_check, user_check, json_check
 from users.models import Token
 
 from .models import Game, Review
@@ -28,7 +28,7 @@ def games_detail(request, slug):
 
 @method_check(method='GET')
 def review_list(request, slug):
-    data = ReviewSerializer(Review.objects.all())
+    data = ReviewSerializer(Review.objects.all(), request=request)
     return data.json_response()
 
 
@@ -36,7 +36,7 @@ def review_list(request, slug):
 @method_check(method='GET')
 def review_detail(request, pk):
     try:
-        data = ReviewSerializer(Review.objects.get(pk=pk))
+        data = ReviewSerializer(Review.objects.get(pk=pk), request=request)
         return data.json_response()
     except Review.DoesNotExist:
         return JsonResponse({'error': 'Review not found'}, status=404)
@@ -44,19 +44,15 @@ def review_detail(request, pk):
 
 @csrf_exempt
 @method_check('POST')
-def add_review(request, slug):
-    regular_expression = r'?P<token> ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$ '
-
-    pattern = re.fullmatch(request.headers, regular_expression)
-    token = pattern['token']
-    data = json.loads(request.body)
+@user_check
+@json_check
+def add_review(request, slug, user, json_data):
     game = Game.objects.get(slug=slug)
-    user = Token.objects.get(key=data['token']).user
     review = Review.objects.create(
-        rating=data['rating'],
-        comment=data['comment'],
+        rating=json_data['rating'],
+        comment=json_data['comment'],
         game=game,
         author=user,
     )
 
-    return redirect('games:review-detail', pk=review.pk)
+    return JsonResponse({'id': review.pk }, status=200)
