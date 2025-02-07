@@ -14,8 +14,8 @@ class OrderSerializer(BaseSerializer):
             'id': instance.pk,
             'status': instance.get_status_display(),
             'key': instance.key if instance.status == Order.Status.PAID else None,
-            'user': BaseSerializer.to_json(UserSerializer(instance.user)),
-            'games': BaseSerializer.to_json(GameSerializer(instance.games)),
+            'user': BaseSerializer.serialize(UserSerializer(instance.user)),
+            'games': BaseSerializer.serialize(GameSerializer(instance.games.all(), request=self.request)),
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
         }

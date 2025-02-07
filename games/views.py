@@ -47,12 +47,18 @@ def review_detail(request, pk):
 @user_check
 @json_check
 def add_review(request, slug, user, json_data):
-    game = Game.objects.get(slug=slug)
-    review = Review.objects.create(
-        rating=json_data['rating'],
-        comment=json_data['comment'],
-        game=game,
-        author=user,
-    )
-
-    return JsonResponse({'id': review.pk }, status=200)
+    try:
+        game = Game.objects.get(slug=slug)
+        if (rating:= json_data['rating']) and (comment:= json_data['comment']):
+            if 1 <= rating <= 5:
+                review = Review.objects.create(
+                    rating=rating,
+                    comment=comment,
+                    game=game,
+                    author=user,
+                )
+                return JsonResponse({'id': review.pk }, status=200)
+            return JsonResponse({'error': 'Rating is out of range' }, status=400)
+        return JsonResponse({'error': 'Missing required fields' }, status=400)
+    except Game.DoesNotExist:
+        return JsonResponse({'error': 'Game not found' }, status=404)

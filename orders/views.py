@@ -18,7 +18,7 @@ def add_order(request, user):
 @method_check('GET')
 def order_game_list(request, pk):
     try:
-        games = GameSerializer(Order.objects.get(pk=pk).games.all())
+        games = GameSerializer(Order.objects.get(pk=pk).games)
         return data.json_response()
     except Order.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
@@ -42,9 +42,11 @@ def order_detail(request, pk, user):
 def confirm_order(request, pk, user):
     try:
         order = Order.objects.get(pk=pk)
-        if order.user == user:
-            order.status = Order.status.PAID
-            return JsonResponse({'status': order.get_status_display()}, status=200)
+        if order.status == Order.status.INITIATED:
+            if order.user == user:
+                order.status = Order.status.PAID
+                return JsonResponse({'status': order.get_status_display()}, status=200)
+            return JsonResponse({'error': 'Orders can only be confirmed when initiated'}, status=400)
         return JsonResponse({'error': 'User is not the owner of requested order'}, status=403)
     except Order.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
@@ -55,10 +57,12 @@ def confirm_order(request, pk, user):
 def cancel_order(request, pk, user):
     try:
         order = Order.objects.get(pk=pk)
-        if order.user == user:
-            order.status = Order.status.CANCELLED
-            return JsonResponse({'status': order.get_status_display()}, status=200)
-        return JsonResponse({'error': 'User is not the owner of requested order'}, status=403)
+        if order.status == Order.status.INITIATED:
+            if order.user == user:
+                order.status = Order.status.CANCELLED
+                return JsonResponse({'status': order.get_status_display()}, status=200)
+            return JsonResponse({'error': 'User is not the owner of requested order'}, status=403)
+        return JsonResponse({'error': 'Orders can only be cancelled when initiated'}, status=400)
     except Order.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
 
