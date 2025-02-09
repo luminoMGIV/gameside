@@ -18,4 +18,5 @@ class OrderSerializer(BaseSerializer):
             'games': BaseSerializer.serialize(GameSerializer(instance.games.all(), request=self.request)),
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
+            'price': instance.price
         }

@@ -22,3 +22,11 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.pk)
+    
+    @staticmethod
+    def check_status(status, status_list):
+        return status in status_list
+
+    @property
+    def price(self):
+        return sum([game.price for game in self.games.all()])
