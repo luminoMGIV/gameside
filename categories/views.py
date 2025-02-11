@@ -18,3 +18,9 @@ def category_detail(request, slug):
         return data.json_response()
     except Category.DoesNotExist:
         return JsonResponse({'error': 'Category not found'}, status=404)
+
+
+# @method_check('GET')
+# def category_test(request, category):
+#     data = CategorySerializer(category, request=request)
+#     return data.json_response()

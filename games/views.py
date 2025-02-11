@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from shared.decorators import method_check, user_check, json_check
+from shared.decorators import json_check, method_check, user_check
 
 from .models import Game, Review
 from .serializers import GameSerializer, ReviewSerializer
@@ -11,8 +11,8 @@ from .serializers import GameSerializer, ReviewSerializer
 def game_list(request):
     games = Game.objects.all()
     for key, value in request.GET.items():
-        filter_key = f'{key}__name' if key == 'category' else f'{key}s__name'
-        games = games.filter(**{filter_key:value})
+        filter_key = f'{key}s__name' if key == 'platform' else f'{key}__name'
+        games = games.filter(**{filter_key: value})
     data = GameSerializer(games, request=request)
     return data.json_response()
 
@@ -64,8 +64,8 @@ def add_review(request, slug, user, json_data):
             )
             review.full_clean()
             review.save()
-            return JsonResponse({'id': review.pk }, status=200)
+            return JsonResponse({'id': review.pk}, status=200)
         except ValidationError:
-            return JsonResponse({'error': 'Rating is out of range' }, status=400)
+            return JsonResponse({'error': 'Rating is out of range'}, status=400)
     except Game.DoesNotExist:
-        return JsonResponse({'error': 'Game not found' }, status=404)
+        return JsonResponse({'error': 'Game not found'}, status=404)
