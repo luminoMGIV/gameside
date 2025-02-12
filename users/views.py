@@ -3,9 +3,9 @@ from django.http import JsonResponse
 from shared.decorators import json_check, method_check
 
 
-@method_check('POST')
-@json_check(['username', 'password'])
-def auth(request, json_data):
+@method_check
+@json_check
+def auth(request, json_data, method, fields):
     username = json_data['username']
     password = json_data['password']
     if user := authenticate(username=username, password=password):

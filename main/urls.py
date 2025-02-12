@@ -25,5 +25,8 @@ urlpatterns = [
     path('api/categories/', include('categories.urls', namespace='categories')),
     path('api/platforms/', include('platforms.urls', namespace='platforms')),
     path('api/orders/', include('orders.urls', namespace='orders')),
-    path('api/auth/', auth, name='auth'),
+    path('api/auth/', auth, {'method': 'POST', 'fields': ['username', 'password']}, name='auth'),
 ]
+
+
+handler404 = 'shared.views.custom_404'

@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
+
+def custom_404(request, exception):
+    return JsonResponse({'error': f'{str(exception)} not found'}, status=404)
