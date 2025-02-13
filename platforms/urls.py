@@ -9,6 +9,5 @@ register_converter(PlatformConverter, 'platform')
 
 urlpatterns = [
     path('', views.platform_list, {'method': 'GET'}, name='platform-list'),
-    # path('<str:slug>/', views.platform_detail, {'method': 'GET'}, name='platform-detail'),
-    path('<platform:platform>/', views.platform_detail, {'method': 'GET'}, name='platform-detail'),
+    path('<str:slug>/', views.platform_detail, {'method': 'GET'}, name='platform-detail'),
 ]
