@@ -45,9 +45,8 @@ def order_check(func):
                 return JsonResponse(
                     {'error': 'User is not the owner of requested order'}, status=403
                 )
-            if status:= kwargs.get('status'):
-                if order.status != status:
-                    return JsonResponse({'error': kwargs.get('msg')}, status=400)
+            if (status:= kwargs.get('status')) and order.status != status:
+                return JsonResponse({'error': kwargs.get('msg')}, status=400)
             return func(order=order, *args, **kwargs)
         except Order.DoesNotExist:
             return JsonResponse({'error': 'Order not found'}, status=404)
@@ -62,7 +61,7 @@ def json_check(func):
         try:
             json_data = json.loads(args[0].body)
             for field in kwargs['fields']:
-                if not json_data.get(field, None):
+                if not json_data.get(field):
                     return JsonResponse({'error': 'Missing required fields'}, status=400)
             return func(json_data=json_data, *args, **kwargs)
         except json.JSONDecodeError:
