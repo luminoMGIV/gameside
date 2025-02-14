@@ -1,7 +1,6 @@
 import json
 import re
 from datetime import date, datetime
-from functools import wraps
 
 from django.http import JsonResponse
 from games.models import Game
