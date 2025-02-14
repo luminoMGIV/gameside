@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import date, datetime
+from functools import wraps
 
 from django.http import JsonResponse
 from games.models import Game
@@ -13,6 +14,19 @@ def method_check(func):
         if args[0].method == kwargs['method']:
             return func(*args, **kwargs)
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    return wrapper
+
+def json_check(func):
+    def wrapper(*args, **kwargs):
+        try:
+            json_data = json.loads(args[0].body)
+            for field in kwargs['fields']:
+                if not json_data.get(field):
+                    return JsonResponse({'error': 'Missing required fields'}, status=400)
+            return func(json_data=json_data, *args, **kwargs)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON body'}, status=400)
 
     return wrapper
 
@@ -37,38 +51,27 @@ def order_check(func):
     def wrapper(*args, **kwargs):
         try:
             order = Order.objects.get(pk=kwargs['pk'])
+            game = None
+
             if func.__name__ == 'add_game_to_order':
                 game = Game.objects.get(slug=kwargs['json_data']['game-slug'])
                 if game.stock == 0:
                     return JsonResponse({'error': 'Game out of stock'}, status=400)
+                
+            
             if kwargs['user'] != order.user:
                 return JsonResponse(
                     {'error': 'User is not the owner of requested order'}, status=403
                 )
             if (status:= kwargs.get('status')) and order.status != status:
                 return JsonResponse({'error': kwargs.get('msg')}, status=400)
-            return func(order=order, *args, **kwargs)
+            return func(order=order, game=game, *args, **kwargs) if game else func(order=order, *args, **kwargs)
         except Order.DoesNotExist:
             return JsonResponse({'error': 'Order not found'}, status=404)
         except Game.DoesNotExist:
             return JsonResponse({'error': 'Game not found'}, status=404)
 
     return wrapper
-
-
-def json_check(func):
-    def wrapper(*args, **kwargs):
-        try:
-            json_data = json.loads(args[0].body)
-            for field in kwargs['fields']:
-                if not json_data.get(field):
-                    return JsonResponse({'error': 'Missing required fields'}, status=400)
-            return func(json_data=json_data, *args, **kwargs)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON body'}, status=400)
-
-    return wrapper
-
 
 def card_check(func):
     def wrapper(*args, **kwargs):

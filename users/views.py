@@ -9,6 +9,6 @@ def auth(request, json_data, method, fields):
     username = json_data['username']
     password = json_data['password']
     if user := authenticate(username=username, password=password):
-        return JsonResponse({'token': user.token.key}, status=200)
+        return JsonResponse({'token': user.token.key})
     else:
         return JsonResponse({'error': 'Invalid credentials'}, status=401)

@@ -22,7 +22,19 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.pk)
-
+    
     @property
     def price(self):
-        return sum([game.price for game in self.games.all()])
+        return sum(game.price for game in self.games.all())
+    
+    def save(self, game=None, *args, **kwargs):
+        self.game = game
+        super(Order, self).save(*args, **kwargs)
+    
+    def change_status(self, status):
+        self.status = status
+        self.save()
+
+    def add_game(self, game):
+        self.games.add(game)
+        self.save(game)

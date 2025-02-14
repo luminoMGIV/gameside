@@ -5,39 +5,33 @@ from shared.decorators import json_check, method_check, user_check
 
 from .models import Game, Review
 from .serializers import GameSerializer, ReviewSerializer
+from .decorators import game_check
 
 
 @method_check
 def game_list(request, method):
     games = Game.objects.all()
     for key, value in request.GET.items():
-        filter_key = f'{key}s__name' if key == 'platform' else f'{key}__name'
+        filter_key = f'{key}s__slug' if key == 'platform' else f'{key}__slug'
         games = games.filter(**{filter_key: value})
     data = GameSerializer(games, request=request)
     return data.json_response()
 
 
 @method_check
-def games_detail(request, slug, method):
-    try:
-        game = Game.objects.get(slug=slug)
-        data = GameSerializer(game, request=request)
-        return data.json_response()
-    except Game.DoesNotExist:
-        return JsonResponse({'error': 'Game not found'}, status=404)
+@game_check
+def games_detail(request, slug, method, game):
+    data = GameSerializer(game, request=request)
+    return data.json_response()
 
 
 @method_check
-def review_list(request, slug, method):
-    try:
-        game = Game.objects.get(slug=slug)
-        data = ReviewSerializer(game.reviews.all(), request=request)
-        return data.json_response()
-    except Game.DoesNotExist:
-        return JsonResponse({'error': 'Game not found'}, status=404)
+@game_check
+def review_list(request, slug, method, game):
+    data = ReviewSerializer(game.reviews.all(), request=request)
+    return data.json_response()
 
 
-@csrf_exempt
 @method_check
 def review_detail(request, pk, method):
     try:
@@ -52,20 +46,17 @@ def review_detail(request, pk, method):
 @method_check
 @json_check
 @user_check
-def add_review(request, slug, user, json_data, method, fields):
+@game_check
+def add_review(request, slug, user, json_data, method, fields, game):
     try:
-        game = Game.objects.get(slug=slug)
-        try:
-            review = Review.objects.create(
-                rating=json_data['rating'],
-                comment=json_data['comment'],
-                game=game,
-                author=user,
-            )
-            review.full_clean()
-            review.save()
-            return JsonResponse({'id': review.pk}, status=200)
-        except ValidationError:
-            return JsonResponse({'error': 'Rating is out of range'}, status=400)
-    except Game.DoesNotExist:
-        return JsonResponse({'error': 'Game not found'}, status=404)
+        review = Review.objects.create(
+            rating=json_data['rating'],
+            comment=json_data['comment'],
+            game=game,
+            author=user,
+        )
+        review.full_clean()
+        review.save()
+        return JsonResponse({'id': review.pk})
+    except ValidationError:
+        return JsonResponse({'error': 'Rating is out of range'}, status=400)

@@ -29,4 +29,4 @@ urlpatterns = [
 ]
 
 
-handler404 = 'shared.views.custom_404'
+# handler404 = 'shared.views.custom_404'
